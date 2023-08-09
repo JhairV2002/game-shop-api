@@ -9,3 +9,64 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Users{
+  id Int @id @default(autoincrement())
+  email String @unique
+  nickname String @unique @db.VarChar(15)
+  profilePhoto String?
+  name String?
+  lastname String?
+  password String
+  role Role
+  invoices Invoice[]
+}
+
+model Category {
+  id Int  @id @default(autoincrement())
+  name String
+  description String
+  games Game[]
+}
+
+model Company {
+  id Int @id @default(autoincrement())
+  name String
+  games Game[]
+}
+
+model Game {
+  id Int @id @default(autoincrement())
+  name String
+  relaseYear String
+  altName String?
+  price Float
+  cover String
+  stock Int
+  companies Company[]
+  categories Category[]
+  invoiceDetails InvoiceDetails[]
+}
+
+model Invoice {
+  id Int @id @default(autoincrement())
+  date DateTime @default(now())
+  number Int @default(autoincrement())
+  taxPercent Float
+  subtotal Float
+  total Float
+  user Users @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model InvoiceDetails {
+  id Int @id @default(autoincrement())
+  quantity Int
+  game Game @relation(fields: [gameId], references: [id])
+  gameId Int
+}
